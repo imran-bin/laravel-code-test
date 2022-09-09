@@ -16,6 +16,7 @@
 
     <!-- Styles -->
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
+    
 </head>
 {{--<body id="page-top">--}}
 
@@ -81,7 +82,7 @@
 {{--</body>--}}
 
 <body id="page-top">
-
+    @include('sweetalert::alert')
 <!-- Page Wrapper -->
 <div id="wrapper">
 
@@ -111,13 +112,7 @@
         <!-- End of Main Content -->
 
         <!-- Footer -->
-        <footer class="sticky-footer bg-white">
-            <div class="container my-auto">
-                <div class="copyright text-center my-auto">
-                    <span>Copyright &copy; Your Website 2020</span>
-                </div>
-            </div>
-        </footer>
+     
         <!-- End of Footer -->
 
     </div>

@@ -2,90 +2,137 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
-use App\Models\ProductVariant;
-use App\Models\ProductVariantPrice;
-use App\Models\Variant;
 use Illuminate\Http\Request;
+use App\Models\Product;
+
+use Illuminate\Support\Str;
+use RealRashid\SweetAlert\Facades\Alert;
 
 class ProductController extends Controller
 {
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
+     * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        return view('products.index');
+        $product = Product::paginate(10);
+        return view('products.index', compact('product'));
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
+     * @return \Illuminate\Http\Response
      */
     public function create()
     {
-        $variants = Variant::all();
-        return view('products.create', compact('variants'));
+        return view('products.create');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Http\JsonResponse
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
 
-    }
+        $data = new Product;
 
+        $data->title = $request->title;
+        $data->description = $request->description;
+        $data->sku = Str::of($request->title)->slug('-');
+    
+        $photo = $request->product_image;
+        $imageName = time() . '.' . $photo->getClientOriginalExtension();
+        $request->product_image->move('media', $imageName);
+        $data->product_image = $imageName;
+        $data->color = $request->color;
+        $data->size = $request->size;
+        $data->style = $request->style;
+        $data->stock = $request->stock;
+        $data->price = $request->price;
+        $data->save();
+        Alert::success('Product Create', 'Success product added successfullay');
+       
+
+
+        return redirect()->back();
+
+    }
 
     /**
      * Display the specified resource.
      *
-     * @param \App\Models\Product $product
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($product)
+    public function show($id)
     {
-
+        //
     }
 
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\Models\Product $product
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit(Product $product)
+    public function edit($id)
     {
-        $variants = Variant::all();
-        return view('products.edit', compact('variants'));
+        $data = Product::find($id);
+        return view('products.edit', compact('data'));
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\Product $product
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Product $product)
+    public function update(Request $request, $id)
     {
-        //
+        $data = Product::find($id);
+        $data->title = $request->title;
+        $data->description = $request->description;
+        $data->sku = Str::of($request->title)->slug('-');
+        $data->color = $request->color;
+        $data->size = $request->size;
+        $data->style = $request->style;
+        $data->stock = $request->stock;
+        $data->price = $request->price;
+        $photo = $request->product_image;
+        if($photo)
+        {
+            $imageName = time() . '.' . $photo->getClientOriginalExtension();
+            $request->product_image->move('media', $imageName);
+            $data->product_image = $imageName;
+            $data->save();
+        }
+       else
+       {
+            $data->save();
+       }
+       Alert::success('Product Update', '  product Update successfullay');
+        return redirect()->route('product.index');
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\Product $product
+     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Product $product)
+    public function destroy($id)
     {
-        //
+        $data = Product::find($id);
+        $data->delete();
+        
+        Alert::warning('Product Delete', '  product Delete successfullay');
+        return redirect()->back();
     }
 }
